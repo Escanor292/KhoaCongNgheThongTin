@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Đăng ký đề tài{% endblock %}
+{% block body %}
+<div class="crumb">Trang chủ / Đề tài đang mở / Đăng ký đề tài</div>
+<h1>Danh sách đề tài đang mở — {{ hoc_ky }}</h1>
+<p class="sub">Sinh viên chỉ được đăng ký <b>01 đề tài</b> trong học kỳ. Hệ thống tự chặn khi đề tài đã đủ số lượng.</p>
+
+{% if mine %}
+  <div class="alert warn">Bạn đã đăng ký đề tài «{{ mine.ten_de_tai }}». Không thể đăng ký thêm.</div>
+{% else %}
+  <div class="alert">Bạn chưa đăng ký đề tài nào trong học kỳ này. Hãy chọn đề tài còn chỗ và bấm <b>Đăng ký</b>.</div>
+{% endif %}
+
+<form class="toolbar" method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="tìm theo tên đề tài, giảng viên..." />
+  <select name="gv">
+    <option value="">Tất cả giảng viên</option>
+    {% for ten in giang_vien %}
+      <option value="{{ ten }}" {% if gv_filter == ten %}selected{% endif %}>{{ ten }}</option>
+    {% endfor %}
+  </select>
+  <select name="slot">
+    <option value="con_cho" {% if slot_filter == 'con_cho' %}selected{% endif %}>Còn chỗ</option>
+    <option value="all" {% if slot_filter == 'all' %}selected{% endif %}>Tất cả trạng thái</option>
+  </select>
+  <button class="btn-ghost" type="submit">Lọc</button>
+</form>
+
+{% if not topics %}
+  <p class="sub">Không có đề tài khớp bộ lọc.</p>
+{% endif %}
+
+{% for t in topics %}
+  {% set con_cho = t.trang_thai == 'MO' and t.so_luong_da_dk < t.so_luong_toi_da %}
+  <div class="card">
+    <div>
+      {% if con_cho %}
+        <span class="tag open">ĐANG MỞ</span>
+      {% else %}
+        <span class="tag full">ĐÃ ĐỦ</span>
+      {% endif %}
+      <span class="tag">{{ t.chuyen_nganh }}</span>
+      <div class="title">{{ t.ten_de_tai }}</div>
+      <div class="meta">
+        GVHD: {{ t.ten_gv }} &nbsp;|&nbsp; Yêu cầu: {{ t.yeu_cau_ky_thuat }}<br>
+        Mô tả: {{ t.mo_ta }}
+      </div>
+    </div>
+    <div class="side">
+      {% if con_cho %}
+        <div class="slots ok">Còn {{ t.so_luong_toi_da - t.so_luong_da_dk }} / {{ t.so_luong_toi_da }} chỗ</div>
+      {% else %}
+        <div class="slots bad">0 / {{ t.so_luong_toi_da }} chỗ — đã đủ</div>
+      {% endif %}
+      <div class="actions">
+        <a class="btn-ghost" href="{{ url_for('chi_tiet_de_tai', ma_dt=t.ma_dt) }}">Chi tiết</a>
+        {% if mine %}
+          <button class="btn-disabled" type="button" disabled>Không thể đăng ký</button>
+        {% elif con_cho %}
+          <button class="btn-primary" type="button"
+            data-open-modal
+            data-id="{{ t.ma_dt }}"
+            data-ten="{{ t.ten_de_tai }}"
+            data-gv="{{ t.ten_gv }}"
+            data-slot="{{ t.so_luong_da_dk }} / {{ t.so_luong_toi_da }}">Đăng ký</button>
+        {% else %}
+          <button class="btn-disabled" type="button" disabled>Không thể đăng ký</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+<div class="overlay" id="modal" hidden>
+  <div class="modal">
+    <h2>Xác nhận đăng ký đề tài</h2>
+    <p>Bạn sắp đăng ký đề tài dưới đây. Mỗi sinh viên chỉ được đăng ký <b>một đề tài</b> trong học kỳ. Thao tác này sẽ chiếm 1 suất của đề tài.</p>
+    <div class="box">
+      <div><b>Đề tài:</b> <span id="m-ten"></span></div>
+      <div><b>GVHD:</b> <span id="m-gv"></span></div>
+      <div><b>Sĩ số hiện tại:</b> <span id="m-slot"></span></div>
+      <div><b>Sinh viên:</b> {{ user.ho_ten }} — {{ user.ma_so }}</div>
+    </div>
+    <form id="m-form" method="post">
+      <div class="row">
+        <button class="btn-ghost" type="button" id="m-cancel">Hủy</button>
+        <button class="btn-ok" type="submit">Xác nhận đăng ký</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const modal = document.getElementById('modal');
+  const form = document.getElementById('m-form');
+  document.querySelectorAll('[data-open-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('m-ten').textContent = btn.dataset.ten;
+      document.getElementById('m-gv').textContent = btn.dataset.gv;
+      document.getElementById('m-slot').textContent = btn.dataset.slot;
+      form.action = `/de-tai/${btn.dataset.id}/dang-ky`;
+      modal.hidden = false;
+    });
+  });
+  document.getElementById('m-cancel').addEventListener('click', () => modal.hidden = true);
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.hidden = true; });
+</script>
+{% endblock %}

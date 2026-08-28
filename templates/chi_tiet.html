@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Chi tiết đề tài{% endblock %}
+{% block body %}
+<div class="crumb"><a href="{{ url_for('danh_sach_de_tai') }}">Đề tài đang mở</a> / Chi tiết</div>
+{% set con_cho = topic.trang_thai == 'MO' and topic.so_luong_da_dk < topic.so_luong_toi_da %}
+<h1>{{ topic.ten_de_tai }}</h1>
+<p class="sub">{{ hoc_ky }} · GVHD: <b>{{ topic.ten_gv }}</b></p>
+
+{% if con_cho %}
+  <span class="tag open">ĐANG MỞ</span>
+{% else %}
+  <span class="tag full">ĐÃ ĐỦ</span>
+{% endif %}
+<span class="tag">{{ topic.chuyen_nganh }}</span>
+
+<div class="detail-grid">
+  <div class="panel">
+    <h3>Mô tả</h3>
+    <p>{{ topic.mo_ta }}</p>
+    <h3>Yêu cầu kỹ thuật</h3>
+    <p>{{ topic.yeu_cau_ky_thuat }}</p>
+  </div>
+  <div class="panel">
+    <h3>Sĩ số</h3>
+    <p class="{{ 'slots ok' if con_cho else 'slots bad' }}">
+      {{ topic.so_luong_da_dk }} / {{ topic.so_luong_toi_da }} sinh viên
+    </p>
+    <h3>Thành viên đã đăng ký</h3>
+    {% if members %}
+      <ul>
+        {% for m in members %}
+          <li>{{ m.ho_ten }} ({{ m.ma_so }}) — {{ m.ngay_dang_ky }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="sub">Chưa có sinh viên.</p>
+    {% endif %}
+
+    {% if mine %}
+      <button class="btn-disabled" disabled>Không thể đăng ký</button>
+    {% elif con_cho %}
+      <form method="post" action="{{ url_for('dang_ky_de_tai', ma_dt=topic.ma_dt) }}"
+            onsubmit="return confirm('Xác nhận đăng ký đề tài này?');">
+        <button class="btn-primary" type="submit">Đăng ký đề tài này</button>
+      </form>
+    {% else %}
+      <button class="btn-disabled" disabled>Không thể đăng ký</button>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

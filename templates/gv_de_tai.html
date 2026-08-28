@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Đề tài hướng dẫn{% endblock %}
+{% block body %}
+<div class="crumb">Trang chủ / Đề tài hướng dẫn</div>
+<h1>Đề tài của giảng viên — {{ hoc_ky }}</h1>
+<p class="sub">Sĩ số được cập nhật ngay khi sinh viên đăng ký thành công.</p>
+{% for t in topics %}
+  <div class="card">
+    <div>
+      <span class="tag {{ 'open' if t.trang_thai == 'MO' else 'full' }}">{{ 'ĐANG MỞ' if t.trang_thai == 'MO' else 'ĐÃ ĐỦ' }}</span>
+      <div class="title">{{ t.ten_de_tai }}</div>
+      <div class="meta">{{ t.yeu_cau_ky_thuat }}</div>
+    </div>
+    <div class="side">
+      <div class="slots">{{ t.so_luong_da_dk }} / {{ t.so_luong_toi_da }} SV</div>
+    </div>
+  </div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}QL Đồ án Môn học{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">DA</div> QL Đồ án Môn học — Khoa CNTT</div>
+  {% if session.get('ma_nd') %}
+  <nav>
+    {% if session.get('vai_tro') == 'SV' %}
+      <a href="{{ url_for('danh_sach_de_tai') }}" class="{{ 'active' if request.endpoint == 'danh_sach_de_tai' else '' }}">Đề tài</a>
+      <a href="{{ url_for('de_tai_cua_toi') }}" class="{{ 'active' if request.endpoint == 'de_tai_cua_toi' else '' }}">Đề tài của tôi</a>
+    {% else %}
+      <a href="{{ url_for('de_tai_cua_toi') }}" class="active">Đề tài hướng dẫn</a>
+    {% endif %}
+  </nav>
+  <div class="user">
+    {{ session.vai_tro }}: {{ session.ho_ten }} — {{ session.ma_so }}
+    <a class="out" href="{{ url_for('logout') }}">Đăng xuất</a>
+  </div>
+  {% endif %}
+</header>
+
+<div class="wrap">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash {{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block body %}{% endblock %}
+</div>
+<footer>Khoa Công nghệ Thông tin — Chức năng Đăng ký đề tài (UC07)</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

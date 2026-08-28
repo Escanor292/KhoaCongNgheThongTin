@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Đề tài của tôi{% endblock %}
+{% block body %}
+<div class="crumb">Trang chủ / Đề tài của tôi</div>
+<h1>Đề tài của tôi — {{ hoc_ky }}</h1>
+
+{% if not topic %}
+  <div class="alert">Bạn chưa đăng ký đề tài. <a href="{{ url_for('danh_sach_de_tai') }}">Chọn đề tài đang mở</a>.</div>
+{% else %}
+  <div class="alert ok">Đã đăng ký lúc {{ mine.ngay_dang_ky }}</div>
+  <div class="panel">
+    <h3>{{ topic.ten_de_tai }}</h3>
+    <p class="meta">GVHD: {{ topic.ten_gv }} · {{ topic.chuyen_nganh }} · Sĩ số {{ topic.so_luong_da_dk }}/{{ topic.so_luong_toi_da }}</p>
+    <p>{{ topic.mo_ta }}</p>
+    <h3>Thành viên nhóm</h3>
+    <ul>
+      {% for m in members %}
+        <li>{{ m.ho_ten }} ({{ m.ma_so }})</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+{% endblock %}

@@ -10,6 +10,10 @@ Phần code này cài **chức năng Đăng ký đề tài (UC07)** — đúng g
 - Một sinh viên chỉ được 1 đề tài / học kỳ
 - Kiểm tra lại trong transaction (tránh 2 SV chiếm cùng suất cuối)
 
+## Tài liệu phân tích & thiết kế
+
+- [PhanTich_ThietKe_QLDoAnMonHocLHU.docx](./PhanTich_ThietKe_QLDoAnMonHocLHU.docx) — cây chức năng, use case, ERD, giao diện UC07, luồng nghiệp vụ
+
 ## Chạy local
 
 ```bash
